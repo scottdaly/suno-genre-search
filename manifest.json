@@ -4,7 +4,11 @@
   "version": "1.2",
   "description": "Passively collects Suno genres as you browse and makes them searchable.",
   "permissions": ["storage"],
-  "host_permissions": ["*://suno.com/*", "http://localhost:4000/*"],
+  "host_permissions": [
+    "*://suno.com/*",
+    "http://localhost:3002/*",
+    "https://suno.rsdaly.com/*"
+  ],
   "background": {
     "service_worker": "background.js"
   },

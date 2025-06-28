@@ -124,7 +124,7 @@ function App() {
 
       <div className="container max-w-4xl mx-auto p-4 sm:p-6">
         <div className="bg-white backdrop-blur-sm rounded-xl shadow-lg p-6 sm:p-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-center text-slate-800 mb-6">
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-6">
             Suno Tag Explorer
           </h1>
 

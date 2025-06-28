@@ -1,1 +1,51 @@
 @import "tailwindcss";
+
+/* Custom dark scrollbar styles to match the background aesthetic */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #475569 #1e293b;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+  border: 1px solid #334155;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background: #94a3b8;
+}
+
+/* Specific styling for dropdown scrollbars to be even more subtle */
+.category-dropdown *::-webkit-scrollbar {
+  width: 6px;
+}
+
+.category-dropdown *::-webkit-scrollbar-track {
+  background: #f8fafc;
+  border-radius: 3px;
+}
+
+.category-dropdown *::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.category-dropdown *::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

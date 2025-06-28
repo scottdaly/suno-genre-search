@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Suno Genre Collector",
+  "version": "1.2",
+  "description": "Passively collects Suno genres as you browse and makes them searchable.",
+  "permissions": ["storage"],
+  "host_permissions": ["*://suno.com/*", "http://localhost:4000/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://suno.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["injector.js"],
+      "matches": ["*://suno.com/*"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

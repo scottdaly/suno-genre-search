@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: sans-serif;
+        width: 300px;
+        padding: 10px;
+      }
+      #searchInput {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 8px;
+        margin-bottom: 10px;
+      }
+      #genreList {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-height: 350px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+      }
+      #genreList li {
+        padding: 6px 8px;
+        border-bottom: 1px solid #eee;
+      }
+      #status {
+        color: #888;
+        font-size: 0.9em;
+        margin-bottom: 10px;
+      }
+      #exportButton {
+        display: block;
+        width: 100%;
+        padding: 8px;
+        margin-top: 10px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Suno Genre Database</h3>
+    <div id="status">Loading...</div>
+    <input type="text" id="searchInput" placeholder="Search genres..." />
+    <ul id="genreList"></ul>
+    <button id="exportButton">Export as JSON</button>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

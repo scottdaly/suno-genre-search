@@ -6,10 +6,10 @@ const cors = require("cors");
 const { categorizeTags } = require("./categorize.js"); // Import the AI logic
 
 const app = express();
-const PORT = 4000;
+const PORT = 3001;
 
 // --- Middleware ---
-app.use(cors({ origin: "http://localhost:5173" })); // Allow requests from your Vite app
+app.use(cors({ origin: "http://localhost:5173, https://suno.rsdaly.com" })); // Allow requests from your Vite app
 app.use(express.json()); // Allow the server to parse JSON request bodies
 
 // --- Database Setup ---
@@ -64,12 +64,9 @@ app.post("/api/genres", async (req, res) => {
     !Array.isArray(incomingTags) ||
     incomingTags.length === 0
   ) {
-    return res
-      .status(400)
-      .json({
-        error:
-          'Request body must be an object with a non-empty "genres" array.',
-      });
+    return res.status(400).json({
+      error: 'Request body must be an object with a non-empty "genres" array.',
+    });
   }
 
   try {

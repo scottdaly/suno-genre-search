@@ -1,6 +1,23 @@
 // categorize.js
-require("dotenv").config(); // Load environment variables from .env
+require("dotenv").config();
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+// --- 1. Define the Single Source of Truth for Categories ---
+const CATEGORIES = [
+  "Tempo & Meter",
+  "Era / Time-Period Vibe",
+  "Core Genre Family",
+  "Sub-Genre & Fusion Styles",
+  "Instrumentation & Sound Sources",
+  "Vocal Characteristics",
+  "Mood / Emotion",
+  "Production & Mix Aesthetics",
+  "Rhythmic & Structural Traits",
+  "Cultural / Regional Flavor",
+  "Language & Lyrical Context",
+  "Themes & Imagery",
+  "Miscellaneous / Meta",
+];
 
 // --- Configuration ---
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -9,47 +26,64 @@ if (!process.env.GEMINI_API_KEY) {
 }
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-const categoriesDescription = `
-1. Tempo & Meter: Speed, rhythm pace (e.g., "60 bpm", "fast-paced").
-2. Era / Time-Period Vibe: Decades, historical references (e.g., "80s", "90s R&B").
-3. Core Genre Family: Broad umbrellas (e.g., "rock", "pop", "hip-hop", "jazz", "house").
-4. Sub-Genre & Fusion Styles: Specific cross-breeds (e.g., "dream-pop", "latin house").
-5. Instrumentation & Sound Sources: Instruments, synths, vocals (e.g., "808 bassline", "electric guitar").
-6. Vocal Characteristics: Descriptions of the voice (e.g., "husky female vocals", "yodeling").
-7. Mood / Emotion: Adjectives of feeling (e.g., "uplifting", "dark", "melancholic").
-8. Production & Mix Aesthetics: Studio effects, audio quality (e.g., "deep reverb", "vinyl crackle").
-9. Rhythmic & Structural Traits: Song arrangement, groove (e.g., "syncopated percussion", "anthem chorus").
-10. Cultural / Regional Flavor: Places or cultures (e.g., "cumbia colombiana", "turkish rap", "k-pop").
-11. Language & Lyrical Context: Explicit languages (e.g., "português", "japanese lyrics").
-12. Themes & Imagery: Conceptual words (e.g., "science fiction", "beach", "road trip").
-13. Miscellaneous / Meta: Catch-all for prompts, quality, or unclassifiable tags.
-`;
+// --- 2. Create a Numbered List for the Prompt ---
+const categoriesNumberedList = CATEGORIES.map(
+  (cat, index) => `${index + 1}. ${cat}`
+).join("\n");
 
 const getPrompt = (tagsToCategorize) => `
-You are an expert musicologist and audio engineer tasked with categorizing musical tags.
-Analyze the following list of tags and categorize each one into ONLY ONE of the predefined categories.
+You are an expert musicologist. Your task is to categorize musical tags from a list.
+Respond with a valid JSON object where keys are the original tags and values are the **corresponding category NUMBER** from the list below.
 
-Here are the categories and their descriptions:
-${categoriesDescription}
+CATEGORIES:
+${categoriesNumberedList}
 
-Your task is to respond with a valid JSON object. The keys of the object should be the original tags, and the values should be the full category name as a string (e.g., "Core Genre Family"). Do not add any extra text, comments, or markdown formatting like \`\`\`json before or after the JSON object.
+RULES:
+- The value for each tag in your JSON response MUST be an integer between 1 and ${
+  CATEGORIES.length
+}.
+- Do NOT use the category name, only the number.
+- Do NOT include any extra text, comments, or markdown formatting like \`\`\`json.
 
 Example Input: ["heavy metal", "slow build up", "80s"]
 Example JSON Output:
 {
-  "heavy metal": "Core Genre Family",
-  "slow build up": "Rhythmic & Structural Traits",
-  "80s": "Era / Time-Period Vibe"
+  "heavy metal": 3,
+  "slow build up": 9,
+  "80s": 2
 }
 
 Now, categorize the following tags:
 ${JSON.stringify(tagsToCategorize)}
 `;
 
-async function categorizeTags(tags) {
-  if (tags.length === 0) {
-    return {};
+// --- 3. Create a Normalization Function (The Safety Net) ---
+function normalizeCategory(aiResponseValue) {
+  // If the AI correctly returned a number, use it.
+  if (
+    typeof aiResponseValue === "number" &&
+    aiResponseValue >= 1 &&
+    aiResponseValue <= CATEGORIES.length
+  ) {
+    return CATEGORIES[aiResponseValue - 1];
   }
+
+  // If the AI made a mistake and returned a string, try to map it.
+  if (typeof aiResponseValue === "string") {
+    const lowerCaseResponse = aiResponseValue.toLowerCase();
+    // This is where we handle the exact problem you saw
+    if (lowerCaseResponse.includes("lyrical")) {
+      return "Language & Lyrical Context";
+    }
+    // Add more fuzzy matching here if needed in the future
+  }
+
+  // If all else fails, return the default fallback category.
+  return "Miscellaneous / Meta";
+}
+
+async function categorizeTags(tags) {
+  if (tags.length === 0) return {};
 
   try {
     console.log(`Sending ${tags.length} tags to AI for categorization...`);
@@ -61,13 +95,18 @@ async function categorizeTags(tags) {
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
+    const aiResponseObject = JSON.parse(cleanedJsonString);
 
-    const categorizedData = JSON.parse(cleanedJsonString);
-    console.log("Successfully categorized tags via AI.");
-    return categorizedData;
+    // Normalize the entire response object
+    const finalCategorizedData = {};
+    for (const tag in aiResponseObject) {
+      finalCategorizedData[tag] = normalizeCategory(aiResponseObject[tag]);
+    }
+
+    console.log("Successfully categorized and normalized tags via AI.");
+    return finalCategorizedData;
   } catch (error) {
     console.error("Error during AI categorization:", error);
-    // On error, return an object where each tag maps to the fallback category
     const fallbackData = {};
     for (const tag of tags) {
       fallbackData[tag] = "Miscellaneous / Meta";
@@ -76,5 +115,5 @@ async function categorizeTags(tags) {
   }
 }
 
-// Export the main function so server.js can use it
+// Export the main function
 module.exports = { categorizeTags };

@@ -6,7 +6,7 @@ const cors = require("cors");
 const { categorizeTags } = require("./categorize.js"); // Import the AI logic
 
 const app = express();
-const PORT = 3001;
+const PORT = 3002;
 
 // --- Middleware ---
 app.use(cors({ origin: "http://localhost:5173, https://suno.rsdaly.com" })); // Allow requests from your Vite app

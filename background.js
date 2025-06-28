@@ -8,7 +8,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 async function sendGenresToServer(newGenres) {
-  const serverUrl = "http://localhost:4000/api/genres";
+  const serverUrl = "https://suno.rsdaly.com/api/genres";
 
   console.log(`Sending ${newGenres.length} genres to server...`);
 

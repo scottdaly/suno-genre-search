@@ -12,6 +12,7 @@ async function sendGenresToServer(newGenres) {
 
   console.log(`Sending ${newGenres.length} genres to server...`);
 
+  console.log("Preparing to send these exact tags:", newGenres);
   try {
     const response = await fetch(serverUrl, {
       method: "POST",

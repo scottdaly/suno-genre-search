@@ -58,6 +58,7 @@ app.get("/api/genres", async (req, res) => {
 // POST: Receive new tags, categorize them, and add to the database
 app.post("/api/genres", async (req, res) => {
   const { genres: incomingTags } = req.body;
+  console.log("Received tags: ", incomingTags);
 
   if (
     !incomingTags ||
